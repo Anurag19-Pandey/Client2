@@ -1,0 +1,333 @@
+.chat-container{
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.chatLeftSection{
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 100%;
+    background-color: #d9deff;
+    border: 1px solid rgba(81, 81, 81, 0.5);
+}
+
+.tenPointQuerySupportContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.tenPointLogoNameCont{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchInputContainer{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border-radius: 20px;
+    background-color: white;
+}
+
+.searchInput{
+    width: 90%;
+    border: none;
+}
+
+.search{
+    width: 100%;
+    border: none;
+    border-radius: 20px;
+    outline: none;
+    padding: 7px;
+}
+
+.searchBtnCont{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10%;
+}
+
+.searchBtn{
+    border: none;
+    cursor: pointer;
+    background: transparent;
+}
+
+.TenPointName{
+    font-size: 16px;
+    margin-left: 10px;
+    color: rgb(110, 110, 110);
+}
+
+.chatRightSection{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 70%;
+    height: 100%;
+    background:linear-gradient( to right , #b2bcfd, #d9deff, #e1e5fd);
+
+}
+
+.user_query_list_container{
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-color: #b2bcfd;
+    cursor: pointer;
+}
+
+.user_query_list_container::-webkit-scrollbar{
+    width: 5px;
+}
+
+.user_query_list_container::-webkit-scrollbar-track{
+    background: transparent;   
+}
+
+.user_query_list_container::-webkit-scrollbar-thumb{
+        background: gray;
+}
+
+.user_query_list{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    padding: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.user_query_list:hover{
+    background-color: rgba(191, 199, 253, 0.906);
+}
+
+.userImageAndNameCont{
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.userProfileImageInChatInfo{
+    background-color: transparent;
+    height:50px;
+    width:50px;
+    border-radius: 50%;
+}
+
+.userLastMessageContainer{
+    height:fit-content;
+    width: 80%;
+}
+
+.userNameQuery{
+    margin-bottom: 0px;
+}
+
+.userMessage{
+    width: 60%;
+    display: flex;
+    align-items: center;
+}
+
+.userLastMessageInfo{
+    display: flex;
+    align-items: center;
+    height: fit-content;
+}
+
+.lastMessage{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    color: gray;
+}
+
+.userTimeAndUnseenMessageCont{
+    width: 40%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.lastMessagedeliverDate{
+    color: rgb(101, 101, 101);
+    font-size: 12px;
+}
+
+.userLastMessage{
+    font-size: 12px;
+    margin-top: 0px;
+    color: rgb(101, 101, 101);
+}
+
+
+.chatHeaderContainer{
+    width: 99%;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #d9deff;
+    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
+}
+
+.chatUserName{
+    margin-left: 10px;
+}
+
+.chatBodyContainer{
+    margin-top: 2px;
+    width: 96%;
+    height: 80%;
+    padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-image:linear-gradient( to right , #b2bcfd, #d9deff, #e1e5fd) , url("https://t4.ftcdn.net/jpg/05/97/49/09/360_F_597490918_dugDbSuqx6YSRmCaYiZJ6pCr37cXK3Rv.jpg");
+    background-position: center;
+    background-size: cover;
+}
+
+.chatBodyContainer::-webkit-scrollbar{
+    width: 5px;
+}
+
+.chatBodyContainer::-webkit-scrollbar-track{
+    background: transparent;   
+}
+
+.chatBodyContainer::-webkit-scrollbar-thumb{
+        background: gray;
+}
+
+.rightSideChatContainer{
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    height: 100%;
+    height: fit-content;
+    margin-bottom: 10px;
+}
+
+.leftSideChatContainer{
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 10px;
+}
+
+.messageInfoContainerRight{
+    max-width: 90%;
+    width: fit-content;
+    height: fit-content;
+    background-color: #b2bcfd;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
+}
+
+.messageInfoContainerLeft{
+    max-width: 90%;
+    width: fit-content;
+    height: fit-content;
+    background-color: #d9deff;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
+}
+
+.userSentByName{
+    text-transform: capitalize;
+    font-size: 12px;
+    color: rgb(68, 68, 68);
+}
+
+.message{
+    font-size: 14px;
+    word-break: break-all;
+}
+
+.messageTime{
+    font-size: 10px;
+    color: rgb(101, 101, 101);
+}
+
+.messageTimeMedia{
+    display: flex;
+    justify-content: flex-end;
+    font-size: 10px;
+    color: rgb(101, 101, 101);
+}
+
+.chatFooterContainer{
+    width: 99%;
+    height: 10%;
+    padding: 5px;
+    background-color: #d9deff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.messageInput{
+    width: 80%;
+    height: 40%;
+    border:1px solid gray ;
+    border-radius: 20px;
+    padding: 10px;
+    outline: none;
+    background: transparent;
+}
+
+.sendMessageBtn{
+    width: 5%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+    font-size: 18px;
+    border-radius: 50%;
+    background-color:  #475BD8;
+    color: white;
+    border: none;
+    outline: none;
+}
+
+.user_message{
+    margin-left: 10px;
+    color: rgb(112, 112, 112);
+}
+
+.deliverTime{
+    font-size: 10px;
+}
+
+.unseenMessageCount{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 5px;
+    font-size: 8px;
+    padding: 5px;
+    color: white;
+    background-color: #475BD8;
+}
