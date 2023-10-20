@@ -51,23 +51,22 @@
 
 .searchInputContainer{
     display: flex;
-    justify-content: space-between;
+    justify-content:space-evenly;
     width: 100%;
     border-radius: 20px;
-    background-color: white;
+    background-color: white;  
 }
 
 .searchInput{
-    width: 90%;
+    width: 80%;
     border: none;
 }
 
 .search{
     width: 100%;
     border: none;
-    border-radius: 20px;
     outline: none;
-    padding: 7px;
+    padding: 7px 5px;
 }
 
 .searchBtnCont{
@@ -81,6 +80,15 @@
     border: none;
     cursor: pointer;
     background: transparent;
+    outline: none;
+}
+
+.closeBtnContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10%;
+    cursor: pointer;
 }
 
 .TenPointName{
@@ -236,6 +244,21 @@
         background: gray;
 }
 
+.chatStartDateContainer{
+    width : 100% ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chatStartDate{
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: white;
+
+}
+
 .rightSideChatContainer{
     display: flex;
     justify-content: flex-end;
@@ -285,6 +308,14 @@
 
 .messageTime{
     font-size: 10px;
+    color: rgba(101, 101,101);
+}
+
+.messageMediaTime{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    font-size: 10px;
     color: rgb(101, 101, 101);
 }
 
@@ -293,6 +324,14 @@
     justify-content: flex-end;
     font-size: 10px;
     color: rgb(101, 101, 101);
+}
+
+.deletedMessage{
+    font-size: 14px;
+    color: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .chatFooterContainer{
@@ -316,8 +355,8 @@
 }
 
 .sendMessageBtn{
-    width: 5%;
-    height: 80%;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -348,4 +387,23 @@
     padding: 5px;
     color: white;
     background-color: #475BD8;
+}
+
+.chatAttachment{
+    display: none;
+}
+
+.chatFileButton{
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    font-size: 18px;
+    border-radius: 50%;
+    background-color:  #475BD8;
+    color: white;
+    border: none;
+    outline: none;
 }

@@ -4,17 +4,39 @@ import io from 'socket.io-client' ;
 import axios from 'axios' ;
 import ImageContainer from '../components/ImageContainer';
 import {IoSendSharp} from "react-icons/io5" ;
-import {BsImageFill , BsFillCameraVideoFill, BsSearch , BsFillPlayCircleFill} from "react-icons/bs" ;
+import {BsImageFill , BsFillCameraVideoFill , BsFillPlayCircleFill} from "react-icons/bs" ;
+import {AiOutlineCloseCircle , AiOutlineStop} from "react-icons/ai" ;
+import {MdAttachment , MdDelete} from 'react-icons/md';
+import {RiUserSearchLine} from "react-icons/ri";
 import TenPointLogo from "../assets/10pointlogo.png" ;
 import CustomModal from '../components/CustomModal';
+import { uploadingImage } from '../utilities/customUpload';
 
-const finalUrl = process.env.REACT_APP_NODE_ENV === 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_SERVER_PROD
+const finalUrl = 'https://test-765857d6-8ee2-4ea8-aef6-80efe5a112f6.10point.ai'
 const socket = io.connect(finalUrl) ;
 
 const Chat = () => {
 
   // setting current message
   const [curr_message , setCurrMessage] = useState("") ;
+
+  const month = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'July',
+    'Aug',
+    'Sept',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  // setting conversation happened on a particular day
+  let conversation = [];
   
   const [search , setSearch] = useState('') ;
 
@@ -43,8 +65,14 @@ const Chat = () => {
 
   const [videoUrl, setVideoUrl] = useState('');
 
+  const [mediaModalShow , setMediaModalShow] = useState(false) ;
+  // const [loader , setLoader] = useState(false) ;
+  
+  const [file , setFile] = useState('') ;
+
   const handleClose = () => {
     setShow(false);
+    setMediaModalShow(false) ;
     setTimeout(() => {
       if (imageUrl.length > 0) setImageUrl('');
       if (videoUrl.length > 0) setVideoUrl('');
@@ -95,6 +123,12 @@ const Chat = () => {
 
     socket.on("sending_to_admin",(data) =>{
       allQueryUser() ;
+      if(data.sent_by == 'admin' && data.room != room) return;
+        setLoadMessage(loadmessages => [...loadmessages , data]) ;
+        setTimeout(() =>{
+          scrollToDown() ;
+        },100) ;
+     
     }) ;
 
      socket.on("sending_to_clients" ,(data)=>{
@@ -145,26 +179,26 @@ const Chat = () => {
   }
 
   // sending the message
-  const  sendMessage = async(event) =>{
+  const  sendMessage = async(url , media_type) =>{
 
-    event.preventDefault() ;
-
-    if(curr_message.trim().length && active.length > 0){
+    if((curr_message.trim().length || url != null) && active.length > 0){
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
           sent_by : 'admin',
           Id : room,
           message : curr_message,
-          url : null ,
-          media_type : 'text' ,
+          url : url ,
+          media_type : media_type ,
           created_at : created_at,
           updatemssg: `${curr_message.replaceAll("'", `\'\'`)}`
         }
     
      setCurrMessage("") ;
-     setLoadMessage([...loadmessages , {message : curr_message , sent_by : 'admin' , media_type : 'text' ,created_at : created_at }]) ;
+     setLoadMessage([...loadmessages , {message : curr_message , sent_by : 'admin' , media_type : media_type ,created_at : created_at , url : url}]) ;
      socket.emit("joinRoom" , room) ;
      socket.emit("send_message" , messageData) ;
+     if(mediaModalShow)
+        handleClose() ;
      scrollToDown() ;
   }
   }
@@ -201,10 +235,116 @@ const Chat = () => {
         return search.full_name.toLowerCase().includes(event.target.value.toLowerCase()) ;
     })) ;
 }
-  
-// console.log(active);
 
-//   console.log("this is search array : ",searchArray) ;
+  const clearSearch = () =>{
+    setSearch('');
+  }
+
+  const handleFile = (event) => {
+    if (
+      event.target.files &&
+      event.target.files.length > 0 &&
+      event.target.files[0].type.includes('video')
+    ) {
+      // setLoader(true);
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.addEventListener('load', () => {
+        uploadImage(reader.result , 'video');
+      });
+    }
+
+    if (
+      event.target.files &&
+      event.target.files.length > 0 &&
+      event.target.files[0].type.includes('image')
+    ) {
+      const reader = new FileReader();
+      reader.readAsDataURL(event.target.files[0]);
+      reader.addEventListener('load', () => {
+        uploadImage(reader.result , 'image');
+      });
+    }
+  };
+
+  const uploadImage = (file , type) => {
+    if (type == 'video') {
+      uploadingImage(dataURItoBlob(file), `chat`, `${room}`)
+        .then((res) => {
+          setVideoUrl(res.filename) ;
+          setTimeout(() => {
+            setMediaModalShow(true) ;
+            scrollToDown();
+            // setVideoUrl('') ;
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      // setLoader(true);
+      uploadingImage(
+        dataURItoBlob(file),
+        `chat`,
+        `${room}`,
+      )
+        .then((res) => {
+          setImageUrl(res.filename) 
+          setTimeout(() => {
+            setMediaModalShow(true) ;
+            scrollToDown();
+            // setImageUrl('') ;
+            // handleLoaderClosing();
+          }, 1000);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const dataURItoBlob = (dataURI) => {
+    var byteString = atob(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  };
+
+  const handleDate = (created_at) => {
+    const d = new Date(created_at * 1000);
+    const completeDate = d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear();
+    if (conversation.includes(completeDate)) {
+      return null;
+    } else {
+      conversation.push(completeDate);
+      return   <p className='chatStartDate'>{completeDate}</p>;
+    }
+  };
+
+  const deleteMsg = async(chat_id) =>{
+
+    const deleteInfo = {
+      chat_id: chat_id ,
+      user_id: room
+    }
+
+    socket.emit("delete_message" , deleteInfo) ;
+
+    setLoadMessage(loadmessages.map((lmsg)=>{
+          if(lmsg.chat_id == chat_id)
+            lmsg.message_status = 'inactive' ;
+
+          return lmsg ;
+    }))
+  }
 
   return (
     <div className='chat-container'>
@@ -215,11 +355,14 @@ const Chat = () => {
                <p className='TenPointName'>Ten Point Query Support</p>
               </div>
                <div className="searchInputContainer">
+               <div className='searchBtnCont'>
+                 <RiUserSearchLine style={{color:'gray' , fontSize : '12px'}}/>
+                </div>
                 <div className='searchInput'>
                <input className='search' name='search' type="text" value={search} placeholder='Search' onChange={(event) => searchUser(event)}/>
                 </div>
-                <div className='searchBtnCont'>
-                  <button className="searchBtn"><BsSearch style={{color:'gray'}}/></button>
+                <div className='closeBtnContainer' onClick={()=> clearSearch()} style={{  visibility : search.length > 0 ? 'visible' : 'hidden'}}>
+                    <AiOutlineCloseCircle style={{fontSize : '12px' , color : 'gray'}} />
                 </div>
                </div>
             </div>
@@ -230,7 +373,7 @@ const Chat = () => {
              searchArray.map((user , index) =>{
               return(
                   <>
-                  {console.log("This is search" , searchArray.length)}
+
               <div className="user_query_list" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
                     <div className='userImageAndNameCont'>
                       <img src={user.profile_image} className="userProfileImageInChatInfo" />
@@ -238,6 +381,7 @@ const Chat = () => {
                     <div className="userLastMessageContainer">
                     <p className='userNameQuery'>{user.full_name}</p>
                       {
+                        user.message_status != 'inactive' ?
                         user.media_type == "image" ? 
                         <div className='userLastMessageInfo'>
                           <div className='userMessage'>
@@ -266,7 +410,9 @@ const Chat = () => {
                             <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
                             {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                           </div>
-                          </div>
+                          </div> :
+                         <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
+
                       }
                      
                     </div>
@@ -275,10 +421,12 @@ const Chat = () => {
               )
               }) 
             :
+            search.length > 0 ? 
+            <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
             active.length > 0 && active.map((user , index) =>{
                 return(
                     <>
-                     {console.log("This is active")}
+                    
                 <div className="user_query_list" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
                       <div className='userImageAndNameCont'>
                         <img src={user.profile_image} className="userProfileImageInChatInfo" />
@@ -286,6 +434,7 @@ const Chat = () => {
                       <div className="userLastMessageContainer">
                       <p className='userNameQuery'>{user.full_name}</p>
                         {
+                          user.message_status != 'inactive' ?
                           user.media_type == "image" ? 
                           <div className='userLastMessageInfo'>
                             <div className='userMessage'>
@@ -315,6 +464,8 @@ const Chat = () => {
                               {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                             </div>
                             </div>
+                            :
+                            <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
                         }
                        
                       </div>
@@ -335,25 +486,41 @@ const Chat = () => {
                     <p className='chatUserName'>{chatName}</p>
                 </div>
                 <div className='chatBodyContainer'>
+               
                 {
                 chat && loadmessages && loadmessages.map((lmsg , index)=>{
                     return(
-                          lmsg.sent_by == 'admin' ?
+                      <div>
+                         <div className='chatStartDateContainer'>
+                              {handleDate(lmsg.created_at)}
+                         </div>
+                          {lmsg.sent_by == 'admin' ?
+                              (
                               <div className='rightSideChatContainer' key={index}>
+                               {
+                               lmsg.message_status != 'inactive' ? 
+                               <div className='deleteMsgContainer' onClick={() => deleteMsg(lmsg.chat_id)}>
+                                      <MdDelete/>
+                                  </div> : null
+                                  }
                                 <div className='messageInfoContainerRight'>
                                 <p className='userSentByName'>You</p>
                                {
+                                  lmsg.message_status != 'inactive' ?
                                   lmsg.media_type == 'text' ? 
                                   <p className='message'>{lmsg.message}&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>: 
                                   lmsg.media_type == 'image' ?  
-                                  <><img src={lmsg.url} width={"200px"} height={"200px"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageTime'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <><img src={lmsg.url} width={"200px"} height={"200px"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"} > <source src={ lmsg.url }/></video>
                                    <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
-                                  <p className='messageTime'>{handleTime(lmsg.created_at)}</p></div>
+                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div> : 
+                                  <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>
                                }
                                 </div>
                                
-                              </div>:
+                              </div>
+                              ):
+                              (
                               <div className='leftSideChatContainer' key={index}>
                                   <div className='messageInfoContainerLeft'>
                                 <p className='userSentByName'>{lmsg.sent_by}</p>
@@ -368,14 +535,27 @@ const Chat = () => {
                                }
                                 </div>
                               </div>
+                              )}
+                        </div>
                         )
                     })
                   }
                   <div ref={containerRef}></div>
                   </div>
                 <div className='chatFooterContainer'>
+                <label className='chatAttachmentLabel'>
+              <div className='chatFileButton'>
+                <MdAttachment className='chatFileBtn' style={{ color: '#fff' }} />
+              </div>
+              <input
+                type='file'
+                name='file'
+                className='chatAttachment'
+                onChange={handleFile}
+              />
+            </label>
                       <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
-                      <button className='sendMessageBtn' onClick={(event) => sendMessage(event)}><IoSendSharp/></button>
+                      <button className='sendMessageBtn' onClick={() => sendMessage(null , 'text')}><IoSendSharp/></button>
                 </div>
                </>
 }
@@ -385,7 +565,29 @@ const Chat = () => {
           handleClose={handleClose}
           imageUrl={imageUrl}
           videoUrl={videoUrl}
-        ></CustomModal>
+          title={''}
+          btnText={''}
+          bodyContent={''}
+          displayHeader={false}
+          displayBody={true}
+          displayFooter={false} 
+          backgroundClr={'transparent'}
+          sendMessage={null}
+        />
+         <CustomModal
+          show={mediaModalShow}
+          handleClose={handleClose}
+          imageUrl={imageUrl}
+          videoUrl={videoUrl}
+          title={'Preview'}
+          btnText={'Send'}
+          bodyContent={''}
+          displayHeader={true}
+          displayBody={true}
+          displayFooter={true} 
+          backgroundClr={'white'}
+          sendMessage={sendMessage}
+        />
     </div>
   )
 }
