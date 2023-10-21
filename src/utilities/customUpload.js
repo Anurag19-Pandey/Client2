@@ -21,7 +21,7 @@ export const uploadingImage = (file, nameAndId, userId) => {
 
   const finalName = uuidv4();
   return new Promise((resolve, rej) => {
-    axios.get(`https://test-765857d6-8ee2-4ea8-aef6-80efe5a112f6.10point.ai/api/getAwsCredentialsWithBucketConfiguration`).then((res) => {
+    axios.get(`${process.env.REACT_APP_SERVER_PROD}/api/getAwsCredentialsWithBucketConfiguration`).then((res) => {
       console.log(res);
       const { result } = res.data;
       console.log(result) ;

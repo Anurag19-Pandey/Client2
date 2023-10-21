@@ -12,7 +12,8 @@ import TenPointLogo from "../assets/10pointlogo.png" ;
 import CustomModal from '../components/CustomModal';
 import { uploadingImage } from '../utilities/customUpload';
 
-const finalUrl = 'https://test-765857d6-8ee2-4ea8-aef6-80efe5a112f6.10point.ai'
+const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_PROD_DEV ;
+
 const socket = io.connect(finalUrl) ;
 
 const Chat = () => {
@@ -102,7 +103,6 @@ const Chat = () => {
   const allQueryUser = async() =>{
       const {data} = await axios.get(`${finalUrl}/api/allquery`);
       setActive(data.result) ;
-      // console.log(data.result) ;
   }
 
   useEffect(()=>{
@@ -181,7 +181,7 @@ const Chat = () => {
   // sending the message
   const  sendMessage = async(url , media_type) =>{
 
-    if((curr_message.trim().length || url != null) && active.length > 0){
+    if((curr_message.trim().length || !url) && active.length > 0){
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
           sent_by : 'admin',
@@ -275,7 +275,6 @@ const Chat = () => {
           setTimeout(() => {
             setMediaModalShow(true) ;
             scrollToDown();
-            // setVideoUrl('') ;
           }, 1000);
         })
         .catch((err) => {
@@ -293,8 +292,6 @@ const Chat = () => {
           setTimeout(() => {
             setMediaModalShow(true) ;
             scrollToDown();
-            // setImageUrl('') ;
-            // handleLoaderClosing();
           }, 1000);
         })
         .catch((err) => {
@@ -368,12 +365,10 @@ const Chat = () => {
             </div>
             <div className='user_query_list_container'>
            {
-
             searchArray.length > 0 ? 
              searchArray.map((user , index) =>{
               return(
                   <>
-
               <div className="user_query_list" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
                     <div className='userImageAndNameCont'>
                       <img src={user.profile_image} className="userProfileImageInChatInfo" />
@@ -555,7 +550,7 @@ const Chat = () => {
               />
             </label>
                       <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
-                      <button className='sendMessageBtn' onClick={() => sendMessage(null , 'text')}><IoSendSharp/></button>
+                      <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
                 </div>
                </>
 }
