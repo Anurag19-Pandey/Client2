@@ -12,7 +12,7 @@ import TenPointLogo from "../assets/10pointlogo.png" ;
 import CustomModal from '../components/CustomModal';
 import { uploadingImage } from '../utilities/customUpload';
 
-const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_PROD_DEV ;
+const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_SERVER_PROD;
 
 const socket = io.connect(finalUrl) ;
 
@@ -115,6 +115,26 @@ const Chat = () => {
     containerRef.current?.scrollIntoView({ behaviour: 'smooth' });
   };
 
+  const deleteMsg = (chat_id) =>{
+
+    const deleteInfo = {
+      chat_id: chat_id ,
+      user_id: room
+    }
+
+    socket.emit("delete_message" , deleteInfo) ;
+
+    setLoadMessage(loadmessages.map((lmsg)=>{
+
+        if(lmsg.chat_id == chat_id)
+          lmsg.message_status = 'inactive';
+        
+            return lmsg ;        
+    })) ;
+
+    allQueryUser() ;
+  }
+
   useEffect(() =>{
     scrollToBottom() ;
   },[curr_message])
@@ -131,20 +151,22 @@ const Chat = () => {
      
     }) ;
 
-     socket.on("sending_to_clients" ,(data)=>{
+    socket.on("sending_to_clients" ,(data)=>{
       allQueryUser() ;
       if(data.sent_by == 'admin' && data.room != room) return;
         setLoadMessage(loadmessages => [...loadmessages , data]) ;
         setTimeout(() =>{
           scrollToDown() ;
         },100) ;
-      });
+    });
 
-      return (() =>{
+    return (() =>{
         socket.off("sending_to_admin") ;
         socket.off("sending_to_clients");
+        
       })
   },[]) ;
+
 
   // getting all the chats
   const chatWindow = async(id , name , profileImage) => {
@@ -160,12 +182,12 @@ const Chat = () => {
               setChatName(name) ;
               setprofileImage(profileImage) ;
               setChat(true) ;
-             const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
-             setLoadMessage(data.result) ;
+              const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
+              setLoadMessage(data.result) ;
            }
            else{
-             const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
-             setLoadMessage(data.result) ;
+            const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
+            setLoadMessage(data.result) ;
            }
            
            if(searchArray.length > 0){
@@ -180,8 +202,9 @@ const Chat = () => {
 
   // sending the message
   const  sendMessage = async(url , media_type) =>{
-
-    if((curr_message.trim().length || !url) && active.length > 0){
+    
+    if((curr_message.trim().length || url.length > 0) && active.length > 0){
+      
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
           sent_by : 'admin',
@@ -238,6 +261,7 @@ const Chat = () => {
 
   const clearSearch = () =>{
     setSearch('');
+    setSearchArray([]) ;
   }
 
   const handleFile = (event) => {
@@ -326,23 +350,6 @@ const Chat = () => {
     }
   };
 
-  const deleteMsg = async(chat_id) =>{
-
-    const deleteInfo = {
-      chat_id: chat_id ,
-      user_id: room
-    }
-
-    socket.emit("delete_message" , deleteInfo) ;
-
-    setLoadMessage(loadmessages.map((lmsg)=>{
-          if(lmsg.chat_id == chat_id)
-            lmsg.message_status = 'inactive' ;
-
-          return lmsg ;
-    }))
-  }
-
   return (
     <div className='chat-container'>
         <div className='chatLeftSection'>
@@ -406,12 +413,12 @@ const Chat = () => {
                             {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                           </div>
                           </div> :
-                         <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
+                         <p className='deletedMessage'><AiOutlineStop/>&nbsp;Message deleted&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
 
                       }
                      
                     </div>
-                  </div>
+              </div>
                   </>
               )
               }) 
@@ -460,7 +467,15 @@ const Chat = () => {
                             </div>
                             </div>
                             :
-                            <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
+                            <div className='userLastMessageInfo'>
+                            <div className='userMessage'>
+                            <p className='lastMessage'><AiOutlineStop/>&nbsp;Message deleted</p>
+                            </div>
+                            <div className='userTimeAndUnseenMessageCont'>
+                              <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                              {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
+                            </div>
+                            </div>
                         }
                        
                       </div>
@@ -502,13 +517,13 @@ const Chat = () => {
                                 <p className='userSentByName'>You</p>
                                {
                                   lmsg.message_status != 'inactive' ?
-                                  lmsg.media_type == 'text' ? 
+                                 ( lmsg.media_type == 'text' ? 
                                   <p className='message'>{lmsg.message}&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>: 
                                   lmsg.media_type == 'image' ?  
-                                  <><img src={lmsg.url} width={"200px"} height={"200px"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"} > <source src={ lmsg.url }/></video>
                                    <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
-                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div> : 
+                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div>) : 
                                   <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>
                                }
                                 </div>
@@ -523,7 +538,7 @@ const Chat = () => {
                                   lmsg.media_type == 'text' ? 
                                   <p>{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
                                   lmsg.media_type == 'image' ? 
-                                  <><img src={lmsg.url} width={"200px"} height={"200px"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageTimeMedia'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageTimeMedia'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"}> <source src={ lmsg.url }/></video>
                                   <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
                                   <p className='messageTimeMedia'>{handleTime(lmsg.created_at)}</p></div>

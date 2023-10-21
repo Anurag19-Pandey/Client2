@@ -22,9 +22,9 @@ export const uploadingImage = (file, nameAndId, userId) => {
   const finalName = uuidv4();
   return new Promise((resolve, rej) => {
     axios.get(`${process.env.REACT_APP_SERVER_PROD}/api/getAwsCredentialsWithBucketConfiguration`).then((res) => {
-      console.log(res);
+      
       const { result } = res.data;
-      console.log(result) ;
+     
       const bucket = new S3({
         params: {
           Bucket: window.location.href.includes('app.10point.ai')
@@ -35,7 +35,7 @@ export const uploadingImage = (file, nameAndId, userId) => {
         secretAccessKey: result.secret,
         region: result.region,
       });
-      console.log(bucket, 'bwahaha');
+      
       const params = { Key: finalName, ContentType: file.type, Body: file };
       // console.log(params, 'file uploaaaaaaaaaaaaaaaaad');
     //   store.dispatch(loadingActions.pending());

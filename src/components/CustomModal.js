@@ -4,12 +4,7 @@ import './CustomModalStyles.css';
 const CustomModal = (props) => {
   const { show, handleClose, imageUrl, videoUrl, title , btnText , bodyContent, displayBody , displayFooter , displayHeader, backgroundClr , sendMessage} = props;
 
-  console.log(imageUrl) ;
-
   const sendMsg = ()=>{
-    console.log("called") ;
-    console.log( "ImageUrl : " + imageUrl) ;
-    console.log( "videoUrl : " + videoUrl) ;
     if(imageUrl.length > 0)
       sendMessage(imageUrl , 'image') ;
     
