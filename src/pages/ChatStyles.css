@@ -14,15 +14,16 @@
     width: 30%;
     height: 100%;
     background-color: #d9deff;
-    border: 1px solid rgba(81, 81, 81, 0.5);
+    border-right: 1px solid rgba(81, 81, 81, 0.5);
 }
 
 .tenPointQuerySupportContainer{
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* align-items: center; */
     flex-direction: column;
-    padding: 10px;
+    padding:10px 10px 0px 10px;
+    background-color:#253287 ;
 }
 
 .chatVideo{
@@ -45,16 +46,19 @@
 
 .tenPointLogoNameCont{
     display: flex;
-    justify-content: center;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .searchInputContainer{
     display: flex;
     justify-content:space-evenly;
     width: 100%;
+    color : black;
+    font-weight: 500;
     border-radius: 20px;
     background-color: white;  
+    margin-bottom: 20px;
 }
 
 .searchInput{
@@ -63,6 +67,8 @@
 }
 
 .search{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
     width: 100%;
     border: none;
     outline: none;
@@ -93,8 +99,10 @@
 
 .TenPointName{
     font-size: 16px;
-    margin-left: 10px;
-    color: rgb(110, 110, 110);
+    font-family: 'Montserrat', sans-serif;
+    margin: 0px 0px 0px 10px;
+    color: #FFF;
+    font-weight: 400;
 }
 
 .chatRightSection{
@@ -104,43 +112,46 @@
     flex-direction: column;
     width: 70%;
     height: 100%;
-    background:linear-gradient( to right , #b2bcfd, #d9deff, #e1e5fd);
-
+    background: #1f2551;
 }
 
-.user_query_list_container{
+.userQueryListContainer{
     width: 100%;
     height: 100%;
     display: block;
     overflow-y: scroll;
     overflow-x: hidden;
-    background-color: #b2bcfd;
+    background-color: #1f2551;
     cursor: pointer;
 }
 
-.user_query_list_container::-webkit-scrollbar{
+.userQueryListContainer::-webkit-scrollbar{
     width: 5px;
 }
 
-.user_query_list_container::-webkit-scrollbar-track{
+.userQueryListContainer::-webkit-scrollbar-track{
     background: transparent;   
 }
 
-.user_query_list_container::-webkit-scrollbar-thumb{
+.userQueryListContainer::-webkit-scrollbar-thumb{
         background: gray;
 }
 
-.user_query_list{
+.userQueryList{
     display: flex;
     align-items: center;
     width: 100%;
-    height: 60px;
+    height: 70px;
     padding: 5px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.user_query_list:hover{
-    background-color: rgba(191, 199, 253, 0.906);
+.userQueryList:hover{
+    background-color: #101951;
+}
+
+.changeBackQuery{
+    background-color: #1a2674;
+    pointer-events: none;
 }
 
 .userImageAndNameCont{
@@ -159,11 +170,22 @@
 }
 
 .userLastMessageContainer{
-    height:fit-content;
     width: 80%;
+    height:100%;
+}
+
+.nameAndUnseenMsgCont{
+    width: 100%;
+    height: 50%;
+    display: flex;
+    align-items: center;
 }
 
 .userNameQuery{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    width: 65%;
+    color: white;
     margin-bottom: 0px;
 }
 
@@ -176,27 +198,34 @@
 .userLastMessageInfo{
     display: flex;
     align-items: center;
-    height: fit-content;
+    height: 50%;
+    margin: 0px;
 }
 
 .lastMessage{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 12px;
-    color: gray;
+    color: white;
+    margin: 0px;
 }
 
 .userTimeAndUnseenMessageCont{
-    width: 40%;
+    width: 60%;
     display: flex;
     justify-content: flex-start;
     align-items: center;
 }
 
 .lastMessagedeliverDate{
-    color: rgb(101, 101, 101);
+    font-family: 'Montserrat', sans-serif;
     font-size: 12px;
+    font-weight: 500;
+    color: white;
 }
 
 .userLastMessage{
@@ -207,27 +236,58 @@
 
 
 .chatHeaderContainer{
-    width: 99%;
+    width: 100%;
     height: 10%;
     display: flex;
     align-items: center;
     padding: 5px;
-    background-color: #d9deff;
-    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
+    background-color: #253287;
 }
 
+.chatHeaderCanvasContainer{
+    width: 100%;
+    height: 7%;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    background-color: #253287;
+}
+
+.userImagePlaceholderContainer{
+   width : 30px;
+   height:30px;
+   background-position : center ;
+   background-size :cover ;
+   border-radius : 50% ;
+   border: 2px solid white;
+   padding: 5px;
+}
 .chatUserName{
-    margin-left: 10px;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    margin:0px 0px 0px 10px;
 }
 
 .chatBodyContainer{
     margin-top: 2px;
-    width: 96%;
+    width: 100%;
     height: 80%;
     padding: 10px;
     overflow-y: scroll;
     overflow-x: hidden;
-    background-image:linear-gradient( to right , #b2bcfd, #d9deff, #e1e5fd) , url("https://t4.ftcdn.net/jpg/05/97/49/09/360_F_597490918_dugDbSuqx6YSRmCaYiZJ6pCr37cXK3Rv.jpg");
+    background-color:linear-gradient( to right , #253287, #1f2551);
+}
+
+.chatBodyCanvasContainer{
+    margin-top: 2px;
+    width: 100%;
+    height: 86%;
+    padding: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    background-image:url("https://w0.peakpx.com/wallpaper/580/650/HD-wallpaper-whatsapp-bg-dark-background-thumbnail.jpg");
     background-position: center;
     background-size: cover;
 }
@@ -245,18 +305,23 @@
 }
 
 .chatStartDateContainer{
-    width : 100% ;
+    width :100% ;
+    height: fit-content;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin: 10px;
+   
 }
 
 .chatStartDate{
+    font-family: 'Montserrat', sans-serif;
     font-size: 12px;
     padding: 5px;
-    border-radius: 10px;
-    background-color: white;
-
+     margin: 0px;
+     background-color: white;
+     border-radius: 10px;
+    color: black;
 }
 
 .rightSideChatContainer{
@@ -279,44 +344,58 @@
     max-width: 90%;
     width: fit-content;
     height: fit-content;
-    background-color: #b2bcfd;
+    background-color: #253287;
     padding: 5px;
     border-radius: 5px;
-    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
 }
 
 .messageInfoContainerLeft{
     max-width: 90%;
     width: fit-content;
     height: fit-content;
-    background-color: #d9deff;
+    background-color: #2d3570;
     padding: 5px;
     border-radius: 5px;
-    box-shadow: 1px 1px 1px 1px rgb(224, 224, 224);
+}
+
+.SentByName{
+    font-family: 'Montserrat', sans-serif;
+    color: orange;
+    text-transform: capitalize;
+    font-size: 12px;
+    margin: 0px 0px 2px 0px;
 }
 
 .userSentByName{
+    font-family: 'Montserrat', sans-serif;
     text-transform: capitalize;
     font-size: 12px;
-    color: rgb(68, 68, 68);
+    color: rgb(0, 206, 0);
+    margin: 0px 0px 2px 0px;
 }
 
 .message{
+    font-family: 'Montserrat', sans-serif;
+    color: white;
     font-size: 14px;
     word-break: break-all;
+    margin: 0px 0px 2px 0px;
 }
 
 .messageTime{
+    font-family: 'Montserrat', sans-serif;
+    color: white;
     font-size: 10px;
-    color: rgba(101, 101,101);
 }
 
 .messageMediaTime{
+    font-family: 'Montserrat', sans-serif;
+    color: white;
     width: 100%;
     display: flex;
     justify-content: flex-end;
     font-size: 10px;
-    color: rgb(101, 101, 101);
+    margin: 2px 0px 0px 0px;
 }
 
 .messageTimeMedia{
@@ -327,8 +406,11 @@
 }
 
 .deleteMsgContainer{
-    width: fit-content;
-    height: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
     background-color: rgba(128, 128, 128, 0.203);
     border: 1px solid rgb(206, 206, 206);
     cursor: pointer;
@@ -336,18 +418,34 @@
     padding: 2px;
 }
 
+.deleteIcon{
+    color: white;
+}
+
 .deletedMessage{
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     color: gray;
     display: flex;
     align-items: center;
+    margin: 0px 0px 2px 0px;
 }
 
 .chatFooterContainer{
-    width: 99%;
+    width: 100%;
     height: 10%;
     padding: 5px;
-    background-color: #d9deff;
+    background-color: #253287;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chatFooterCanvasContainer{
+    width: 100%;
+    height: 7%;
+    padding: 5px;
+    background-color: #253287;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -355,7 +453,9 @@
 
 .messageInput{
     width: 80%;
-    height: 40%;
+    height: 80%;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
     border:1px solid gray ;
     border-radius: 20px;
     padding: 10px;
@@ -388,14 +488,16 @@
 }
 
 .unseenMessageCount{
+    width: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 5px;
-    font-size: 8px;
+    font-size: 10px;
     padding: 5px;
     color: white;
+    border-radius: 50%;
     background-color: #475BD8;
+    margin: 0px;
 }
 
 .chatAttachment{
@@ -415,4 +517,92 @@
     color: white;
     border: none;
     outline: none;
+}
+
+.backArrowBtnContainer{
+    width: 5%;
+    color: white;
+    margin-right: 5px;
+}
+
+.backArrowBtn{
+    font-size: 20px;
+}
+
+.currentTabStatus{
+    width: 100%;
+    height: 30px;
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.chatTabContainer{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 2px solid white;
+    cursor: pointer;
+}
+
+.updateTabContainer{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.tabName{
+    font-family: 'Montserrat', sans-serif;
+    color: white ;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0px;
+}
+
+.offcanvas.offcanvas-bottom{
+    border: none !important;
+}
+
+.offcanvas{
+    background-color: #253287 !important;
+}
+
+.canvaContainer{
+    display: none;
+}
+
+.spinnerContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (max-width : 440px) {
+    
+    .chatRightSection{
+        display: none;
+    }
+
+    .chatLeftSection{
+        width: 100%;
+    }
+
+    .userProfileImageInChatInfo{
+        width: 40px;
+        height: 40px;
+    }
+
+    .canvaContainer{
+        display: block;
+    }
+
+    .chatLeftSection{
+        border: none;
+    }
 }

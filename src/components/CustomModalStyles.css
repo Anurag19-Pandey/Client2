@@ -50,6 +50,10 @@
     height:100% ;
   }
 
+  .customModalFooter{
+    margin:10px 0px;
+  }
+
   .customModalBtn{
     color: white;
     width: 70px;
@@ -63,3 +67,8 @@
     border-radius:5px;
   }
 
+   .modalTitle{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+     color : white;
+   }

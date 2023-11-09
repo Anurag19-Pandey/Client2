@@ -16,11 +16,11 @@ const CustomModal = (props) => {
     <div className={`customModal ${show ? 'show' : ''}`} onClick={() => handleClose()}>
       <div className='customModalContent' onClick={(event) => event.stopPropagation()} style={{ background : backgroundClr}}>
         <div className='customModalHeader' style={{ display : displayHeader == false ? 'none' : 'block'}}>
-        <p>{title}</p>
+        <p className="modalTitle">{title}</p>
         </div>
         <div className='customModalBody' style={{ display : displayBody == false ? 'none' : 'block'}}>
           {imageUrl.length > 0 ? (
-            <img src={imageUrl} style={{ width: '300px', height: 'auto' }} />
+            <img src={imageUrl} style={{ width: '100%', height: 'auto' , maxHeight:'400px'  }} />
           ) : null}
           {videoUrl.length > 0 ? (
             <video className='modalBodyMediaVideo' controls>

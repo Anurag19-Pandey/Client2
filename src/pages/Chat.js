@@ -5,12 +5,15 @@ import axios from 'axios' ;
 import ImageContainer from '../components/ImageContainer';
 import {IoSendSharp} from "react-icons/io5" ;
 import {BsImageFill , BsFillCameraVideoFill , BsFillPlayCircleFill} from "react-icons/bs" ;
-import {AiOutlineCloseCircle , AiOutlineStop} from "react-icons/ai" ;
-import {MdAttachment , MdDelete} from 'react-icons/md';
+import {AiOutlineCloseCircle , AiOutlineStop , AiFillDelete} from "react-icons/ai" ;
+import {MdAttachment } from 'react-icons/md';
 import {RiUserSearchLine} from "react-icons/ri";
 import TenPointLogo from "../assets/10pointlogo.png" ;
 import CustomModal from '../components/CustomModal';
 import { uploadingImage } from '../utilities/customUpload';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import {BiArrowBack} from 'react-icons/bi' ;
+import Spinner from 'react-bootstrap/Spinner';
 
 const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_SERVER_PROD;
 
@@ -69,7 +72,11 @@ const Chat = () => {
   const [mediaModalShow , setMediaModalShow] = useState(false) ;
   // const [loader , setLoader] = useState(false) ;
   
+  const [canvaShow , setCanvaShow] = useState(false) ;
+
   const [file , setFile] = useState('') ;
+
+  const inputRef = useRef(null);
 
   const handleClose = () => {
     setShow(false);
@@ -103,6 +110,7 @@ const Chat = () => {
   const allQueryUser = async() =>{
       const {data} = await axios.get(`${finalUrl}/api/allquery`);
       setActive(data.result) ;
+      console.log(data.result) ;
   }
 
   useEffect(()=>{
@@ -143,12 +151,9 @@ const Chat = () => {
 
     socket.on("sending_to_admin",(data) =>{
       allQueryUser() ;
-      if(data.sent_by == 'admin' && data.room != room) return;
-        setLoadMessage(loadmessages => [...loadmessages , data]) ;
-        setTimeout(() =>{
-          scrollToDown() ;
-        },100) ;
-     
+      setTimeout(() =>{
+        scrollToDown() ;
+      },100) ;
     }) ;
 
     socket.on("sending_to_clients" ,(data)=>{
@@ -158,21 +163,19 @@ const Chat = () => {
         setTimeout(() =>{
           scrollToDown() ;
         },100) ;
-    });
+    }) ;
 
     return (() =>{
         socket.off("sending_to_admin") ;
         socket.off("sending_to_clients");
         
-      })
+    })
   },[]) ;
-
 
   // getting all the chats
   const chatWindow = async(id , name , profileImage) => {
-        
            setCurrMessage("") ;
-           
+
            if(room != id){
             if(room != "")
               socket.emit('leave' , room) ;
@@ -182,28 +185,36 @@ const Chat = () => {
               setChatName(name) ;
               setprofileImage(profileImage) ;
               setChat(true) ;
-              const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
+              if(window.innerWidth <= 440)
+              setCanvaShow(true) ;
+
+              const {data} = await axios.get(`${finalUrl}/api/userchat?user_id=${id}&requested_by=admin`) ;
               setLoadMessage(data.result) ;
+              
            }
            else{
-            const {data} = await axios.get(`${finalUrl}/api/userchat/${id}`) ;
+            if(window.innerWidth <= 440)
+            setCanvaShow(true) ;
+
+            const {data} = await axios.get(`${finalUrl}/api/userchat?user_id=${id}&requested_by=admin`) ;
             setLoadMessage(data.result) ;
+          
            }
-           
+
            if(searchArray.length > 0){
              setSearchArray([]) ;
              setSearch('') ;
            }
            setTimeout(() =>{
-            scrollToDown() ;
+            scrollToBottom() ;
           }, 1) ;
           
   }
 
   // sending the message
   const  sendMessage = async(url , media_type) =>{
-    
-    if((curr_message.trim().length || url.length > 0) && active.length > 0){
+
+      if((curr_message.trim().length || url.length > 0) && active.length > 0){
       
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
@@ -226,6 +237,7 @@ const Chat = () => {
   }
   }
 
+  // function for calculating time of a particular message
   const handleTime = (created_at) => {
     const d = new Date(parseInt(created_at) * 1000);
     let am_pm,
@@ -244,7 +256,7 @@ const Chat = () => {
     return hrs + ':' + min + am_pm;
   };
 
-  // search function to 
+  // search function to search by name a particular user
   const searchUser = (event) =>{
       
       setSearch(event.target.value) ;
@@ -259,6 +271,7 @@ const Chat = () => {
     })) ;
 }
 
+  // clearing the search bar
   const clearSearch = () =>{
     setSearch('');
     setSearchArray([]) ;
@@ -340,15 +353,33 @@ const Chat = () => {
   };
 
   const handleDate = (created_at) => {
+   
     const d = new Date(created_at * 1000);
     const completeDate = d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear();
+
     if (conversation.includes(completeDate)) {
       return null;
     } else {
       conversation.push(completeDate);
-      return   <p className='chatStartDate'>{completeDate}</p>;
+      return <p className='chatStartDate'>{completeDate}</p> ;
     }
-  };
+  }
+
+  const handleCanva = () =>{
+    setCanvaShow(false) ;
+    socket.emit('leave' , room) ;
+    setTimeout(()=>{
+      setLoadMessage([]) ;
+    }, 1000) ;
+  }
+  
+  const lastMsgDate = (created_at)=>{
+    const d = new Date(created_at * 1000);
+    const completeDate = d.getDate() + ' ' + month[d.getMonth()] + ', ' + d.getFullYear() % 100;
+    
+    return completeDate ;
+  }
+
 
   return (
     <div className='chat-container'>
@@ -356,7 +387,7 @@ const Chat = () => {
             <div className='tenPointQuerySupportContainer'>
               <div className='tenPointLogoNameCont'>
                <img className="tenPointLogo" src={TenPointLogo} style={{ width : "50px" , height : "50px" , borderRadius : "50%" }}/>
-               <p className='TenPointName'>Ten Point Query Support</p>
+               <p className='TenPointName'>Query Support</p>
               </div>
                <div className="searchInputContainer">
                <div className='searchBtnCont'>
@@ -369,19 +400,31 @@ const Chat = () => {
                     <AiOutlineCloseCircle style={{fontSize : '12px' , color : 'gray'}} />
                 </div>
                </div>
+               <div className="currentTabStatus">
+                  <div className="chatTabContainer">
+                    <p className="tabName">Chats</p>
+                  </div>
+                  <div className="updateTabContainer">
+                    <p className="tabName">Updates</p>
+                  </div>
+                </div>
             </div>
-            <div className='user_query_list_container'>
+            <div className='userQueryListContainer'>
            {
             searchArray.length > 0 ? 
              searchArray.map((user , index) =>{
               return(
                   <>
-              <div className="user_query_list" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
+              <div className="userQueryList" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
                     <div className='userImageAndNameCont'>
                       <img src={user.profile_image} className="userProfileImageInChatInfo" />
                     </div>
                     <div className="userLastMessageContainer">
                     <p className='userNameQuery'>{user.full_name}</p>
+                   {/* { 
+                    user.unseen_messages != 0 ?
+                   <p className='unseenMessageCount'>{user.unseen_messages}</p>  : null
+                  } */}
                       {
                         user.message_status != 'inactive' ?
                         user.media_type == "image" ? 
@@ -390,7 +433,7 @@ const Chat = () => {
                           <p className='lastMessage'><BsImageFill/>&nbsp;Image</p>
                           </div>
                           <div className='userTimeAndUnseenMessageCont'>
-                            <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                            <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span>
                             {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                           </div>
                         </div> : 
@@ -400,7 +443,7 @@ const Chat = () => {
                         <p className='lastMessage'><BsFillCameraVideoFill/>&nbsp;Video</p>
                         </div>
                         <div className='userTimeAndUnseenMessageCont'>
-                          <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                          <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span>
                           {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null }</span> */}
                         </div>
                         </div>
@@ -409,11 +452,11 @@ const Chat = () => {
                           <p className='lastMessage'>{user.message.length <= 10 ? user.message : user.message.substring(0 , 10) + " ..."}</p>
                           </div>
                           <div className='userTimeAndUnseenMessageCont'>
-                            <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                            <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span>
                             {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                           </div>
                           </div> :
-                         <p className='deletedMessage'><AiOutlineStop/>&nbsp;Message deleted&nbsp;&nbsp;<span className='messageTime'>{handleTime(user.created_at)}</span></p>
+                         <p className='deletedMessage'><AiOutlineStop/>&nbsp;Message deleted&nbsp;&nbsp;<span className='messageTime'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span></p>
 
                       }
                      
@@ -429,12 +472,18 @@ const Chat = () => {
                 return(
                     <>
                     
-                <div className="user_query_list" key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}>
+                <div className={`userQueryList ${room == user.user_user_id ? 'changeBackQuery' : null}`} key={index} onClick={() => chatWindow(user.user_user_id , user.full_name , user.profile_image)}  >
                       <div className='userImageAndNameCont'>
                         <img src={user.profile_image} className="userProfileImageInChatInfo" />
                       </div>
                       <div className="userLastMessageContainer">
-                      <p className='userNameQuery'>{user.full_name}</p>
+                        <div className='nameAndUnseenMsgCont'>
+                           <p className='userNameQuery'>{user.full_name}</p>
+                           {/* { 
+                    user.unseen_messages != 0 ?
+                   <p className='unseenMessageCount'>{user.unseen_messages}</p>  : null
+                  } */}
+                        </div>
                         {
                           user.message_status != 'inactive' ?
                           user.media_type == "image" ? 
@@ -443,7 +492,7 @@ const Chat = () => {
                             <p className='lastMessage'><BsImageFill/>&nbsp;Image</p>
                             </div>
                             <div className='userTimeAndUnseenMessageCont'>
-                              <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                              <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " + handleTime(user.created_at)}</span>
                               {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                             </div>
                           </div> : 
@@ -453,7 +502,7 @@ const Chat = () => {
                           <p className='lastMessage'><BsFillCameraVideoFill/>&nbsp;Video</p>
                           </div>
                           <div className='userTimeAndUnseenMessageCont'>
-                            <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                            <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " + handleTime(user.created_at)}</span>
                             {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null }</span> */}
                           </div>
                           </div>
@@ -462,7 +511,7 @@ const Chat = () => {
                             <p className='lastMessage'>{user.message.length <= 10 ? user.message : user.message.substring(0 , 10) + " ..."}</p>
                             </div>
                             <div className='userTimeAndUnseenMessageCont'>
-                              <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                              <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span>
                               {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                             </div>
                             </div>
@@ -472,37 +521,165 @@ const Chat = () => {
                             <p className='lastMessage'><AiOutlineStop/>&nbsp;Message deleted</p>
                             </div>
                             <div className='userTimeAndUnseenMessageCont'>
-                              <span className='lastMessagedeliverDate'>{handleTime(user.created_at)}</span>
+                              <span className='lastMessagedeliverDate'>{lastMsgDate(user.created_at) + " | " +handleTime(user.created_at)}</span>
                               {/* <span className='unseenMessageCount'>{user.delivered_count > 0 ? user.delivered_count : null}</span> */}
                             </div>
                             </div>
                         }
                        
                       </div>
-                    </div>
+                </div>
                     </>
                 )
                 })
                 }
             </div>
         </div>
+        {
+         <div className='canvaContainer'>
+              <Offcanvas className='h-100 p-0' show={canvaShow}  placement='bottom'>
+                <div className='chatHeaderCanvasContainer'>
+                  <div className="backArrowBtnContainer" onClick={handleCanva}>
+                    <BiArrowBack className='backArrowBtn' />
+                  </div>
+                  <div className='userImagePlaceholderContainer' style={{ backgroundImage : `url(${profileImage})`}} ></div>
+                    <p className='chatUserName'>{chatName}</p>
+                </div>
+                <div className='chatBodyCanvasContainer w-100'>               
+                {
+                  loadmessages.length == 0 ?
+                  <div className="spinnerContainer ">
+                    <Spinner animation="border" variant="primary" />
+                  </div>
+                    :
+                chat && loadmessages && loadmessages.map((lmsg , index)=>{
+                    return(
+                      <div>
+                       
+                            <div className='chatStartDateContainer'>
+                            {handleDate(lmsg.created_at)}
+                             </div>
+                          {lmsg.sent_by == 'admin' ?
+                              (
+                              <div className='rightSideChatContainer' key={index}>
+                               {
+                               lmsg.message_status != 'inactive' ? 
+                               <div className='deleteMsgContainer' onClick={() => deleteMsg(lmsg.chat_id)}>
+                                      <AiFillDelete className='deleteIcon'/>
+                                  </div> : null
+                                  }
+                                <div className='messageInfoContainerRight'>
+                                <p className='SentByName'>You</p>
+                               {
+                                  lmsg.message_status != 'inactive' ?
+                                 ( lmsg.media_type == 'text' ? 
+                                  <p className='message'>{lmsg.message}&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>: 
+                                  lmsg.media_type == 'image' ?  
+                                  <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"} > <source src={ lmsg.url }/></video>
+                                   <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
+                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div>) : 
+                                  <p className='deletedMessage'><AiOutlineStop/>&nbsp;You deleted this message&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>
+                               }
+                                </div>
+                               
+                              </div>
+                              ):
+                              (
+                              <div className='leftSideChatContainer' key={index}>
+                                  <div className='messageInfoContainerLeft'>
+                                <p className='userSentByName'>{lmsg.sent_by}</p>
+                               {
+                                  lmsg.media_type == 'text' ? 
+                                  <p className="message">{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
+                                  lmsg.media_type == 'image' ? 
+                                  <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"}> <source src={ lmsg.url }/></video>
+                                  <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
+                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div>
+                               }
+                                </div>
+                              </div>
+                              )}
+                      </div>
+                        )
+                    })
+                  }
+                  <div ref={containerRef}></div>
+                </div>
+                <div className='chatFooterCanvasContainer'>
+                <label className='chatAttachmentLabel'>
+              <div className='chatFileButton'>
+                <MdAttachment className='chatFileBtn' style={{ color: '#fff' }} />
+              </div>
+              <input
+                type='file'
+                name='file'
+                
+                className='chatAttachment'
+                onChange={handleFile}
+              />
+                </label>
+                  <input 
+                  className='messageInput'
+                   name="message" value={curr_message}
+                   ref={inputRef}
+                      onClick={() => {
+                        setTimeout(() => {
+                              scrollToDown();
+                           }, 100);
+                        }} 
+              placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
+              <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
+                </div>
+                      <CustomModal
+                      show={show}
+                      handleClose={handleClose}
+                      imageUrl={imageUrl}
+                      videoUrl={videoUrl}
+                      title={''}
+                      btnText={''}
+                      bodyContent={''}
+                      displayHeader={false}
+                      displayBody={true}
+                      displayFooter={false} 
+                      backgroundClr={'transparent'}
+                      sendMessage={null}
+                    />
+                      <CustomModal
+                      show={mediaModalShow}
+                      handleClose={handleClose}
+                      imageUrl={imageUrl}
+                      videoUrl={videoUrl}
+                      title={'Preview'}
+                      btnText={'Send'}
+                      bodyContent={''}
+                      displayHeader={true}
+                      displayBody={true}
+                      displayFooter={true} 
+                      backgroundClr={'#253287'}
+                      sendMessage={sendMessage}
+                    />
+              </Offcanvas>
+            
+            </div>
+        }
         <div className='chatRightSection'>
             {
                 loadmessages.length == 0 ?  
                 <ImageContainer/> :   
                 <>
                 <div className='chatHeaderContainer'>
-                  <div className='user_image_placeholder_container'  style={{ width : "50px" , height:"50px", backgroundImage : `url(${profileImage})` , backgroundPosition : "center" , backgroundSize : "cover" , borderRadius : "50%" , }}></div>
+                  <div className='userImagePlaceholderContainer'  style={{backgroundImage : `url(${profileImage})` }}></div>
                     <p className='chatUserName'>{chatName}</p>
                 </div>
-                <div className='chatBodyContainer'>
-               
+                <div className='chatBodyContainer'>               
                 {
                 chat && loadmessages && loadmessages.map((lmsg , index)=>{
                     return(
                       <div>
                          <div className='chatStartDateContainer'>
-                              {handleDate(lmsg.created_at)}
+                         {handleDate(lmsg.created_at)}
                          </div>
                           {lmsg.sent_by == 'admin' ?
                               (
@@ -510,11 +687,11 @@ const Chat = () => {
                                {
                                lmsg.message_status != 'inactive' ? 
                                <div className='deleteMsgContainer' onClick={() => deleteMsg(lmsg.chat_id)}>
-                                      <MdDelete/>
+                                      <AiFillDelete className="deleteIcon" style={{ color : 'white'}}/>
                                   </div> : null
                                   }
                                 <div className='messageInfoContainerRight'>
-                                <p className='userSentByName'>You</p>
+                                <p className='SentByName'>You</p>
                                {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
@@ -536,17 +713,17 @@ const Chat = () => {
                                 <p className='userSentByName'>{lmsg.sent_by}</p>
                                {
                                   lmsg.media_type == 'text' ? 
-                                  <p>{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
+                                  <p className='message'>{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
                                   lmsg.media_type == 'image' ? 
-                                  <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageTimeMedia'>{handleTime(lmsg.created_at)}</p> </>:
+                                  <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"}> <source src={ lmsg.url }/></video>
                                   <BsFillPlayCircleFill className='videoPlayBtn' style={{ fontSize : '40px' , color : '#fff'}}/>
-                                  <p className='messageTimeMedia'>{handleTime(lmsg.created_at)}</p></div>
+                                  <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p></div>
                                }
                                 </div>
                               </div>
                               )}
-                        </div>
+                      </div>
                         )
                     })
                   }
@@ -563,7 +740,7 @@ const Chat = () => {
                 className='chatAttachment'
                 onChange={handleFile}
               />
-            </label>
+                </label>
                       <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
                       <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
                 </div>
@@ -595,7 +772,7 @@ const Chat = () => {
           displayHeader={true}
           displayBody={true}
           displayFooter={true} 
-          backgroundClr={'white'}
+          backgroundClr={'#253287'}
           sendMessage={sendMessage}
         />
     </div>
