@@ -172,6 +172,36 @@ const Chat = () => {
     })
   },[]) ;
 
+  useEffect(() => {
+    const keyDownHandler = (event) => {
+       
+       if(event.key == 'Enter' && !event.shiftKey)
+       {
+         event.preventDefault() ;
+         sendMessage('','text') ;
+       }
+    };
+
+    document.addEventListener('keydown', keyDownHandler);
+
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, [curr_message]);
+
+  // turning url into links in message
+  const Linkify = (message)=>{
+
+    if(message.trim().length == 0) return ;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+   
+    message = message.split('\n').map((ele) => <p>${ele}</p>).join('');
+
+    return message.replace(urlRegex, function(url) {
+      return  `<a href=${url} target="_blank">${url}</a>`
+    });
+  } 
+
   // getting all the chats
   const chatWindow = async(id , name , profileImage) => {
            setCurrMessage("") ;
@@ -214,8 +244,12 @@ const Chat = () => {
   // sending the message
   const  sendMessage = async(url , media_type) =>{
 
+      console.log('send message called !');
+      console.log(' Message is : ' ,curr_message) ;
+      console.log('active is : ' , active.length ) ;
       if((curr_message.trim().length || url.length > 0) && active.length > 0){
       
+      console.log(' sending the message') ;
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
           sent_by : 'admin',
@@ -227,10 +261,12 @@ const Chat = () => {
           updatemssg: `${curr_message.replaceAll("'", `\'\'`)}`
         }
     
-     setCurrMessage("") ;
      setLoadMessage([...loadmessages , {message : curr_message , sent_by : 'admin' , media_type : media_type ,created_at : created_at , url : url}]) ;
+     setCurrMessage("") ;
+     
      socket.emit("joinRoom" , room) ;
      socket.emit("send_message" , messageData) ;
+     console.log('message sent');
      if(mediaModalShow)
         handleClose() ;
      scrollToDown() ;
@@ -379,7 +415,6 @@ const Chat = () => {
     
     return completeDate ;
   }
-
 
   return (
     <div className='chat-container'>
@@ -573,7 +608,9 @@ const Chat = () => {
                                {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
-                                  <p className='message'>{lmsg.message}&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>: 
+                                 <>
+                                  <div className='message'>cvb<span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
+                                 </>:
                                   lmsg.media_type == 'image' ?  
                                   <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"} > <source src={ lmsg.url }/></video>
@@ -591,7 +628,9 @@ const Chat = () => {
                                 <p className='userSentByName'>{lmsg.sent_by}</p>
                                {
                                   lmsg.media_type == 'text' ? 
-                                  <p className="message">{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
+                                  <>
+                                  <div className='message'><p  dangerouslySetInnerHTML={{__html :'uikhjugg'}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
+                                  </>:
                                   lmsg.media_type == 'image' ? 
                                   <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"}> <source src={ lmsg.url }/></video>
@@ -695,7 +734,9 @@ const Chat = () => {
                                {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
-                                  <p className='message'>{lmsg.message}&nbsp;&nbsp;<span className='messageTime'>{handleTime(lmsg.created_at)}</span></p>: 
+                                 <>
+                                  <p className='message'><p  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
+                                 </>:
                                   lmsg.media_type == 'image' ?  
                                   <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"} > <source src={ lmsg.url }/></video>
@@ -713,7 +754,9 @@ const Chat = () => {
                                 <p className='userSentByName'>{lmsg.sent_by}</p>
                                {
                                   lmsg.media_type == 'text' ? 
-                                  <p className='message'>{lmsg.message} <span className='messageTime'>{handleTime(lmsg.created_at)}</span></p> : 
+                                  <>
+                                   <p className='message'><p  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
+                                  </>: 
                                   lmsg.media_type == 'image' ? 
                                   <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
                                   <div className="chatVideo" onClick={() =>handleShowVideo(lmsg.url)}> <video className='rightChatVideo' height={"200px"} width={"200px"}> <source src={ lmsg.url }/></video>
@@ -741,7 +784,9 @@ const Chat = () => {
                 onChange={handleFile}
               />
                 </label>
-                      <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
+                      <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => {
+                        if(event.key === 'Enter') return;
+                        setCurrMessage(event.target.value)}}/>
                       <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
                 </div>
                </>
@@ -780,3 +825,4 @@ const Chat = () => {
 }
 
 export default Chat
+
