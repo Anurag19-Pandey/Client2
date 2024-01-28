@@ -519,7 +519,7 @@ const Chat = () => {
               }) 
             :
             search.length > 0 ? 
-            <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
+            <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray' , fontFamily: 'Montserrat,sans-serif'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
             active.length > 0 ? active.map((user , index) =>{
                 return(
                     <>
@@ -615,7 +615,6 @@ const Chat = () => {
                     }
                      
                 </div>
-                // <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
                 }
             </div>
         </div>
