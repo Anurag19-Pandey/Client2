@@ -46,8 +46,45 @@
 
 .tenPointLogoNameCont{
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+}
+
+.tenPointLogoNameInfo{
+    display: flex;
+    align-items: center;
+    width: 80%;
+}
+
+.tenPointOtherOptionCont{
+    display: flex;
+    justify-content: flex-end;
+    width: 20%;
+}
+
+.refreshIcon{
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 50%;
+}
+
+.refreshIcon:hover{
+    background-color: white;
+    color: black;
+    animation: rotateRefreshIcon 0.5s linear;
+}
+
+@keyframes rotateRefreshIcon {
+    0%{
+        transform: rotate(0deg);
+    }
+
+    100%{
+        transform: rotate(360deg);
+    }
 }
 
 .searchInputContainer{
@@ -210,7 +247,7 @@
     justify-content: center;
     align-items: center;
     font-size: 12px;
-    color: white;
+    color: #bcbcbc;
     margin: 0px;
 }
 
@@ -225,7 +262,7 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 12px;
     font-weight: 500;
-    color: white;
+    color: #bcbcbc;
 }
 
 .userLastMessage{
@@ -384,17 +421,20 @@
 
 .messageTime{
     font-family: 'Montserrat', sans-serif;
-    color: white;
-    font-size: 10px;
+    color: #c7c7c7;
+    font-size: 8px;
+    display: flex;
+    justify-content: flex-end;
+    margin: 2px 0px 0px 0px;
 }
 
 .messageMediaTime{
     font-family: 'Montserrat', sans-serif;
-    color: white;
+    color: #c7c7c7;
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    font-size: 10px;
+    font-size: 8px;
     margin: 2px 0px 0px 0px;
 }
 
@@ -453,30 +493,37 @@
 
 .messageInput{
     width: 80%;
-    height: 80%;
+    height: 40px;
     font-family: 'Montserrat', sans-serif;
     color: white;
-    border:1px solid gray ;
-    border-radius: 20px;
+    border:1px solid rgb(180, 180, 180) ;
     padding: 10px;
     outline: none;
+    border-radius: 4px;
     background: transparent;
+    overflow: hidden;
+    resize: none ;
 }
 
 .sendMessageBtn{
-    width: 40px;
+    width: 60px;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-left: 10px;
-    font-size: 18px;
-    border-radius: 50%;
+    font-size: 14px;
+    border-radius: 4px;
     background-color:  #475BD8;
     color: white;
+    padding: 5px;
     border: none;
-    outline: none;
+    outline: none; 
 }
+
+/* .sendMessageArrow:hover{
+   transform: translateX(10px);
+} */
 
 .user_message{
     margin-left: 10px;
@@ -513,10 +560,15 @@
     margin-right: 10px;
     font-size: 18px;
     border-radius: 50%;
-    background-color:  #475BD8;
     color: white;
     border: none;
+    cursor: pointer;
     outline: none;
+    transition: background-color  0.3s ease-in-out;
+}
+
+.chatFileButton:hover{
+    background-color:  #475BD8;
 }
 
 .backArrowBtnContainer{

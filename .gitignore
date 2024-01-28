@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 .env
+firebase.js
+firebase-messaging-sw.js
 
 # testing
 /coverage

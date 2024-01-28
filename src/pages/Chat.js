@@ -13,7 +13,11 @@ import CustomModal from '../components/CustomModal';
 import { uploadingImage } from '../utilities/customUpload';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {BiArrowBack} from 'react-icons/bi' ;
+import { IoMdRefresh } from "react-icons/io";
 import Spinner from 'react-bootstrap/Spinner';
+import { LuSendHorizonal } from "react-icons/lu";
+import { IoIosImages } from "react-icons/io";
+import Skeleton from '@mui/material/Skeleton';
 
 const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_SERVER_PROD;
 
@@ -24,6 +28,7 @@ const Chat = () => {
   // setting current message
   const [curr_message , setCurrMessage] = useState("") ;
 
+  // month array
   const month = [
     'Jan',
     'Feb',
@@ -189,16 +194,22 @@ const Chat = () => {
     };
   }, [curr_message]);
 
-  // turning url into links in message
+
+  // turning url into links in message and adding line breaks 
   const Linkify = (message)=>{
 
     if(message.trim().length == 0) return ;
     const urlRegex = /(https?:\/\/[^\s]+)/g;
    
-    message = message.split('\n').map((ele) => <p>${ele}</p>).join('');
+    message = message.replace(/\n/g, "<br/>");
+
+    const locationUrl = 'https://app.10point.ai'
+
+    message = message.replaceAll('[%host_url%]', locationUrl);
 
     return message.replace(urlRegex, function(url) {
-      return  `<a href=${url} target="_blank">${url}</a>`
+        url = url.replaceAll('<br/>','');
+        return  `<a href=${url} target="_blank" style="color :#8ae38f" }}>${url}</a>`
     });
   } 
 
@@ -244,12 +255,8 @@ const Chat = () => {
   // sending the message
   const  sendMessage = async(url , media_type) =>{
 
-      console.log('send message called !');
-      console.log(' Message is : ' ,curr_message) ;
-      console.log('active is : ' , active.length ) ;
       if((curr_message.trim().length || url.length > 0) && active.length > 0){
-      
-      console.log(' sending the message') ;
+
         const created_at = Math.round(new Date().getTime() / 1000);
         const messageData = {
           sent_by : 'admin',
@@ -266,7 +273,6 @@ const Chat = () => {
      
      socket.emit("joinRoom" , room) ;
      socket.emit("send_message" , messageData) ;
-     console.log('message sent');
      if(mediaModalShow)
         handleClose() ;
      scrollToDown() ;
@@ -294,7 +300,6 @@ const Chat = () => {
 
   // search function to search by name a particular user
   const searchUser = (event) =>{
-      
       setSearch(event.target.value) ;
 
       if(event.target.value.length == 0){
@@ -303,9 +308,14 @@ const Chat = () => {
       }
 
       setSearchArray(active.filter((search)=>{
-        return search.full_name.toLowerCase().includes(event.target.value.toLowerCase()) ;
+        return search.full_name != null && search.full_name.toLowerCase().includes(event.target.value.toLowerCase()) ;
     })) ;
 }
+
+    // to refresh the page
+    const refreshPage = ()=>{
+      window.location.reload(false) ;
+    }
 
   // clearing the search bar
   const clearSearch = () =>{
@@ -389,10 +399,10 @@ const Chat = () => {
   };
 
   const handleDate = (created_at) => {
-   
+
     const d = new Date(created_at * 1000);
     const completeDate = d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear();
-
+  
     if (conversation.includes(completeDate)) {
       return null;
     } else {
@@ -416,13 +426,20 @@ const Chat = () => {
     return completeDate ;
   }
 
+  const numOfSkeleton = [1,2,3,4,5,6,7,8,9,10] ;
+
   return (
     <div className='chat-container'>
         <div className='chatLeftSection'>
             <div className='tenPointQuerySupportContainer'>
               <div className='tenPointLogoNameCont'>
+               <div className='tenPointLogoNameInfo'>
                <img className="tenPointLogo" src={TenPointLogo} style={{ width : "50px" , height : "50px" , borderRadius : "50%" }}/>
                <p className='TenPointName'>Query Support</p>
+               </div>
+               <div className='tenPointOtherOptionCont'>
+               <IoMdRefresh className='refreshIcon' onClick={()=>refreshPage()}/>
+               </div>
               </div>
                <div className="searchInputContainer">
                <div className='searchBtnCont'>
@@ -503,7 +520,7 @@ const Chat = () => {
             :
             search.length > 0 ? 
             <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
-            active.length > 0 && active.map((user , index) =>{
+            active.length > 0 ? active.map((user , index) =>{
                 return(
                     <>
                     
@@ -566,7 +583,39 @@ const Chat = () => {
                 </div>
                     </>
                 )
-                })
+                }) :
+                
+                <div className="userQueryListContainer"  >
+                    {
+                      numOfSkeleton.map(()=>{
+                        return(
+                          <div className="userQueryList" >
+                           <div className='userImageAndNameCont'>
+                      <Skeleton animation="wave" className="userProfileImageInChatInfo" variant="circular" width={40} height={40} />   
+                      </div>
+                      <div className="userLastMessageContainer">
+                        <div className='nameAndUnseenMsgCont'>
+                           <p className='userNameQuery'><Skeleton animation="wave" variant="text" width={'100%'} /></p>
+                        </div>
+                        {
+                          <div className='userLastMessageInfo'>
+                            <div className='userMessage'>
+                            &nbsp;<Skeleton animation="wave" variant="text" width={'90%'} />
+                            </div>
+                            <div className='userTimeAndUnseenMessageCont'>
+                             <Skeleton animation="wave" variant="text"  width={'90%'}/>
+                            </div>
+                          </div>
+                        }
+                       
+                      </div>
+                          </div>
+                        )
+                      })
+                    }
+                     
+                </div>
+                // <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
                 }
             </div>
         </div>
@@ -592,7 +641,7 @@ const Chat = () => {
                       <div>
                        
                             <div className='chatStartDateContainer'>
-                            {handleDate(lmsg.created_at)}
+                            { window.innerWidth <= 440 && handleDate(lmsg.created_at)}
                              </div>
                           {lmsg.sent_by == 'admin' ?
                               (
@@ -609,7 +658,7 @@ const Chat = () => {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
                                  <>
-                                  <div className='message'>cvb<span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
+                                  <div className='message'><p style={{marginBottom : "0px"}}  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
                                  </>:
                                   lmsg.media_type == 'image' ?  
                                   <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
@@ -629,7 +678,7 @@ const Chat = () => {
                                {
                                   lmsg.media_type == 'text' ? 
                                   <>
-                                  <div className='message'><p  dangerouslySetInnerHTML={{__html :'uikhjugg'}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
+                                  <div className='message'><p style={{marginBottom : "0px"}}  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </div>
                                   </>:
                                   lmsg.media_type == 'image' ? 
                                   <><img src={lmsg.url} style={{ width : "200px" , height : "auto" , maxHeight: "360px"}} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
@@ -649,7 +698,7 @@ const Chat = () => {
                 <div className='chatFooterCanvasContainer'>
                 <label className='chatAttachmentLabel'>
               <div className='chatFileButton'>
-                <MdAttachment className='chatFileBtn' style={{ color: '#fff' }} />
+                <IoIosImages className='chatFileBtn' style={{ color: '#fff' }} />
               </div>
               <input
                 type='file'
@@ -659,7 +708,7 @@ const Chat = () => {
                 onChange={handleFile}
               />
                 </label>
-                  <input 
+                  <textarea rows={10} cols={10}
                   className='messageInput'
                    name="message" value={curr_message}
                    ref={inputRef}
@@ -669,7 +718,7 @@ const Chat = () => {
                            }, 100);
                         }} 
               placeholder='Type a message' onChange={(event) => setCurrMessage(event.target.value)}/>
-              <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
+              <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><LuSendHorizonal className='sendMessageArrow' style={{ fontSize: '18px'}}/></button>
                 </div>
                       <CustomModal
                       show={show}
@@ -718,7 +767,7 @@ const Chat = () => {
                     return(
                       <div>
                          <div className='chatStartDateContainer'>
-                         {handleDate(lmsg.created_at)}
+                         {handleDate(lmsg.created_at )}
                          </div>
                           {lmsg.sent_by == 'admin' ?
                               (
@@ -735,7 +784,7 @@ const Chat = () => {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
                                  <>
-                                  <p className='message'><p  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
+                                  <p className='message'><p style={{marginBottom : "0px"}}  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
                                  </>:
                                   lmsg.media_type == 'image' ?  
                                   <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
@@ -755,7 +804,7 @@ const Chat = () => {
                                {
                                   lmsg.media_type == 'text' ? 
                                   <>
-                                   <p className='message'><p  dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
+                                   <p className='message'><p style={{marginBottom : "0px"}}   dangerouslySetInnerHTML={{__html : Linkify(lmsg.message)}} /><span className='messageTime'>{handleTime(lmsg.created_at)}</span> </p>
                                   </>: 
                                   lmsg.media_type == 'image' ? 
                                   <><img src={lmsg.url} width={"200px"} height={"auto"} onClick={() => handleShowImage(lmsg.url)}/> <p className='messageMediaTime'>{handleTime(lmsg.created_at)}</p> </>:
@@ -775,7 +824,7 @@ const Chat = () => {
                 <div className='chatFooterContainer'>
                 <label className='chatAttachmentLabel'>
               <div className='chatFileButton'>
-                <MdAttachment className='chatFileBtn' style={{ color: '#fff' }} />
+                <IoIosImages className='chatFileBtn' style={{ color: '#fff' }} />
               </div>
               <input
                 type='file'
@@ -784,10 +833,10 @@ const Chat = () => {
                 onChange={handleFile}
               />
                 </label>
-                      <input className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => {
+                      <textarea rows={10} cols={10} className='messageInput' name="message" value={curr_message} placeholder='Type a message' onChange={(event) => {
                         if(event.key === 'Enter') return;
                         setCurrMessage(event.target.value)}}/>
-                      <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><IoSendSharp/></button>
+                      <button className='sendMessageBtn' onClick={() => sendMessage('' , 'text')}><LuSendHorizonal className='sendMessageArrow' style={{ fontSize: '18px'}}/></button>
                 </div>
                </>
 }
