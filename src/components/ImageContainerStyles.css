@@ -13,7 +13,7 @@
 
 .query_line{
     font-size: 16px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color : white;
 }
 
@@ -21,13 +21,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #336fd7;
+    background-color: #0944ac;
     color: white;
     width : 160px ;
     height: 40px;
     padding: 5px;
     cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     border-radius: 40px;
     outline: none;
     border :none;
@@ -37,5 +37,5 @@
 }
 
 .getAppBtn:hover{
-    box-shadow: 0px 0px 10px #76a8ff;
+    box-shadow: 0px 0px 10px #143b7c;
 }

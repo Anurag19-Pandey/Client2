@@ -104,7 +104,8 @@
 }
 
 .search{
-    font-family: 'Montserrat', sans-serif;
+    /* font-family: 'Cantarell', sans-serif; */
+    font-family: 'Cantarell', sans-serif;
     font-size: 16px;
     width: 100%;
     border: none;
@@ -136,7 +137,8 @@
 
 .TenPointName{
     font-size: 16px;
-    font-family: 'Montserrat', sans-serif;
+    /* font-family: 'Cantarell', sans-serif; */
+    font-family: 'Cantarell', sans-serif;
     margin: 0px 0px 0px 10px;
     color: #FFF;
     font-weight: 400;
@@ -219,7 +221,7 @@
 }
 
 .userNameQuery{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     font-size: 16px;
     width: 65%;
     color: white;
@@ -240,7 +242,7 @@
 }
 
 .lastMessage{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     font-size: 14px;
     font-weight: 500;
     display: flex;
@@ -259,7 +261,7 @@
 }
 
 .lastMessagedeliverDate{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     font-size: 12px;
     font-weight: 500;
     color: #bcbcbc;
@@ -300,7 +302,7 @@
    padding: 5px;
 }
 .chatUserName{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: white;
     font-size: 16px;
     font-weight: 500;
@@ -352,7 +354,7 @@
 }
 
 .chatStartDate{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     font-size: 12px;
     padding: 5px;
      margin: 0px;
@@ -382,8 +384,8 @@
     width: fit-content;
     height: fit-content;
     background-color: #253287;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 6px 8px 8px 9px;
+    border-radius: 7.5px;
 }
 
 .messageInfoContainerLeft{
@@ -391,28 +393,30 @@
     width: fit-content;
     height: fit-content;
     background-color: #2d3570;
-    padding: 5px;
-    border-radius: 5px;
+    padding: 6px 8px 8px 9px;
+    border-radius: 7.5px;
 }
 
 .SentByName{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: orange;
     text-transform: capitalize;
     font-size: 12px;
-    margin: 0px 0px 2px 0px;
+    margin: 0px 0px 0px -2px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .userSentByName{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     text-transform: capitalize;
     font-size: 12px;
     color: rgb(0, 206, 0);
-    margin: 0px 0px 2px 0px;
+    margin: 0px 0px 0px -2px;
 }
 
 .message{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: white;
     font-size: 14px;
     word-break: break-all;
@@ -420,7 +424,7 @@
 }
 
 .messageTime{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: #c7c7c7;
     font-size: 8px;
     display: flex;
@@ -429,7 +433,7 @@
 }
 
 .messageMediaTime{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: #c7c7c7;
     width: 100%;
     display: flex;
@@ -463,7 +467,7 @@
 }
 
 .deletedMessage{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     font-size: 14px;
     color: gray;
     display: flex;
@@ -494,13 +498,13 @@
 .messageInput{
     width: 80%;
     height: 40px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: white;
-    border:1px solid rgb(180, 180, 180) ;
+    border:none ;
     padding: 10px;
     outline: none;
-    border-radius: 4px;
-    background: transparent;
+    border-radius: 8px;
+    background: #5250cb73;
     overflow: hidden;
     resize: none ;
 }
@@ -609,7 +613,7 @@
 }
 
 .tabName{
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Cantarell', sans-serif;
     color: white ;
     font-size: 16px;
     font-weight: 400;
@@ -657,4 +661,12 @@
     .chatLeftSection{
         border: none;
     }
+}
+
+.css-1eqdgzv-MuiPaper-root-MuiSnackbarContent-root{
+    min-width: fit-content !important;
+}
+
+.css-1eqdgzv-MuiPaper-root-MuiSnackbarContent-root{
+    background-color: #1f2551 !important;
 }

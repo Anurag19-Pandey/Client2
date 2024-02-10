@@ -18,6 +18,9 @@ import Spinner from 'react-bootstrap/Spinner';
 import { LuSendHorizonal } from "react-icons/lu";
 import { IoIosImages } from "react-icons/io";
 import Skeleton from '@mui/material/Skeleton';
+import { MdContentCopy } from "react-icons/md";
+import SnackBar from '../components/SnackBar';
+
 
 const finalUrl = process.env.REACT_APP_NODE_ENV == 'development' ? process.env.REACT_APP_SERVER_DEV : process.env.REACT_APP_SERVER_PROD;
 
@@ -43,6 +46,9 @@ const Chat = () => {
     'Nov',
     'Dec',
   ];
+
+  // snackbar state
+  const [snackbarStatus , setSnakckbarStatus] = useState(false) ;
 
   // setting conversation happened on a particular day
   let conversation = [];
@@ -313,9 +319,9 @@ const Chat = () => {
 }
 
     // to refresh the page
-    const refreshPage = ()=>{
+  const refreshPage = ()=>{
       window.location.reload(false) ;
-    }
+  }
 
   // clearing the search bar
   const clearSearch = () =>{
@@ -428,8 +434,19 @@ const Chat = () => {
 
   const numOfSkeleton = [1,2,3,4,5,6,7,8,9,10] ;
 
+  const copyText = (msg) =>{
+    setSnakckbarStatus(true) ;
+   
+    const locationUrl = 'https://app.10point.ai'
+    msg = msg.replaceAll('[%host_url%]', locationUrl);
+   
+    navigator.clipboard.writeText(msg);
+  }
+
   return (
     <div className='chat-container'>
+     
+
         <div className='chatLeftSection'>
             <div className='tenPointQuerySupportContainer'>
               <div className='tenPointLogoNameCont'>
@@ -519,7 +536,7 @@ const Chat = () => {
               }) 
             :
             search.length > 0 ? 
-            <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray' , fontFamily: 'Montserrat,sans-serif'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
+            <p style={{ width : '100%' , height : '50%' , display : 'flex' , justifyContent : 'center' , alignItems : 'center' , fontSize : '30px' , color : 'gray' , fontFamily: 'Cantarell,sans-serif'}}><RiUserSearchLine style={{fontSize : '40px'}}/>&nbsp;No results found</p> : 
             active.length > 0 ? active.map((user , index) =>{
                 return(
                     <>
@@ -760,7 +777,8 @@ const Chat = () => {
                   <div className='userImagePlaceholderContainer'  style={{backgroundImage : `url(${profileImage})` }}></div>
                     <p className='chatUserName'>{chatName}</p>
                 </div>
-                <div className='chatBodyContainer'>               
+                <div className='chatBodyContainer'> 
+                <SnackBar status={snackbarStatus} snackBarState={setSnakckbarStatus}/>              
                 {
                 chat && loadmessages && loadmessages.map((lmsg , index)=>{
                     return(
@@ -778,7 +796,7 @@ const Chat = () => {
                                   </div> : null
                                   }
                                 <div className='messageInfoContainerRight'>
-                                <p className='SentByName'>You</p>
+                                <p className='SentByName'>You { lmsg.media_type == 'text' && lmsg.message_status != 'inactive' ? <MdContentCopy onClick={()=> copyText(lmsg.message)} style={{ color : '#b2b2b2' , cursor:'pointer'}}/> : null}</p>
                                {
                                   lmsg.message_status != 'inactive' ?
                                  ( lmsg.media_type == 'text' ? 
