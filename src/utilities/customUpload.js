@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 // import { get } from './Remote';
 import axios from 'axios' ;
 
+const finalUrl =  process.env.NODE_ENV == 'development' ? 'https://test-765857d6-8ee2-4ea8-aef6-80efe5a112f6.10point.ai' : 'https://app.10point.ai';
+
 export const uploadingImage = (file, nameAndId, userId) => {
   const { name } = file;
   // let extention = name.split('.').pop();
@@ -21,7 +23,7 @@ export const uploadingImage = (file, nameAndId, userId) => {
 
   const finalName = uuidv4();
   return new Promise((resolve, rej) => {
-    axios.get(`${process.env.REACT_APP_SERVER_PROD}/api/getAwsCredentialsWithBucketConfiguration`).then((res) => {
+    axios.get(`${finalUrl}/api/getAwsCredentialsWithBucketConfiguration`).then((res) => {
       
       const { result } = res.data;
      
