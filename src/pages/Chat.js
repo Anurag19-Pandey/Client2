@@ -114,7 +114,7 @@ const Chat = () => {
 
   // scroll to Bottom 
   const scrollToDown = () => {
-    containerRef.current?.scrollIntoView({ behaviour: 'smooth' });
+    containerRef.current?.scrollIntoView();
   };
 
   // getting all user which is having a query 
@@ -125,8 +125,8 @@ const Chat = () => {
   }
 
   useEffect(()=>{
-    allQueryUser() ;
-    scrollToDown() ;
+    allQueryUser();
+    scrollToDown();
   },[]) ;
 
   // scroll To Bottom will automatically take to last message
