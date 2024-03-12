@@ -120,8 +120,9 @@ const Chat = () => {
   // getting all user which is having a query 
   const allQueryUser = async() =>{
       const {data} = await axios.get(`${finalUrl}/api/allquery`);
-      setActive(data.result) ;
-      console.log(data.result) ;
+      setActive(data.result) ; 
+      
+      console.log( 'this is in all query user : ' , data.result) ;
   }
 
   useEffect(()=>{
@@ -161,16 +162,39 @@ const Chat = () => {
   useEffect(() =>{
 
     socket.on("sending_to_admin",(data) =>{
+      console.log('in admin data : ' , data) ;
+      console.log('current room : ' , room) ;
+
       allQueryUser() ;
+      if(data.length > 1){
+        if(data[1].user_user_id != room) return ;
+        setLoadMessage(loadmessages => [...loadmessages , data[1] , data[0]]) ;
+      }
+      else{
+
+        if(data[0].user_user_id != room) return ;
+        setLoadMessage(loadmessages => [...loadmessages , data[0]]) ;
+      } 
       setTimeout(() =>{
         scrollToDown() ;
       },100) ;
     }) ;
 
     socket.on("sending_to_clients" ,(data)=>{
+      console.log('in client data : ' , data.length) ;
       allQueryUser() ;
-      if(data.sent_by == 'admin' && data.room != room) return;
-        setLoadMessage(loadmessages => [...loadmessages , data]) ;
+      console.log('incoming message room ' , data)
+      console.log('in client data : ' , data);
+      console.log('current room : ' , room) ;
+      if(data.length > 1){
+        if(data[1].user_user_id != room) return ;
+        setLoadMessage(loadmessages => [...loadmessages , data[1] , data[0]]) ;
+      }
+      else{
+
+        if(data[0].user_user_id != room) return ;
+        setLoadMessage(loadmessages => [...loadmessages , data[0]]) ;
+      } 
         setTimeout(() =>{
           scrollToDown() ;
         },100) ;
@@ -257,7 +281,6 @@ const Chat = () => {
           }, 1) ;
           
   }
-
   // sending the message
   const  sendMessage = async(url , media_type) =>{
 
@@ -274,7 +297,7 @@ const Chat = () => {
           updatemssg: `${curr_message.replaceAll("'", `\'\'`)}`
         }
     
-     setLoadMessage([...loadmessages , {message : curr_message , sent_by : 'admin' , media_type : media_type ,created_at : created_at , url : url}]) ;
+    //  setLoadMessage([...loadmessages , {message : curr_message , sent_by : 'admin' , media_type : media_type ,created_at : created_at , url : url}]) ;
      setCurrMessage("") ;
      
      socket.emit("joinRoom" , room) ;
@@ -316,7 +339,7 @@ const Chat = () => {
       setSearchArray(active.filter((search)=>{
         return search.full_name != null && search.full_name.toLowerCase().includes(event.target.value.toLowerCase()) ;
     })) ;
-}
+  }
 
     // to refresh the page
   const refreshPage = ()=>{
@@ -443,10 +466,10 @@ const Chat = () => {
     navigator.clipboard.writeText(msg);
   }
 
+  console.log('total user messages : ' , loadmessages) ;
+
   return (
     <div className='chat-container'>
-     
-
         <div className='chatLeftSection'>
             <div className='tenPointQuerySupportContainer'>
               <div className='tenPointLogoNameCont'>
@@ -766,7 +789,7 @@ const Chat = () => {
                     />
               </Offcanvas>
             
-            </div>
+         </div>
         }
         <div className='chatRightSection'>
             {
